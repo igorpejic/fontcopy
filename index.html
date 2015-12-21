@@ -11,12 +11,16 @@
   <form name="pasteForm">
     <md-input-container class="md-block">
     <label>Paste your text here</label>
-    <input ng-paste='handlepaste($event)' md-maxlength="300000" required="" name="text" ng-model="text" onpaste>
+    <input ng-paste='handlepaste($event)' required="" name="text" ng-model="text" onpaste>
     </md-input-container>
   </form>
-</md-content>
-<span>{{ font }}</span>
+<span ng-bind="font"></span>
+<h2>What your font looks like</h2>
+<div id="font-div">
+  <span ng-bind-html="font"></span>
+</div>
 <div id="div"></div>
+</md-content>
 
  <!-- Angular Material requires Angular.js Libraries -->
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
@@ -41,18 +45,13 @@
             if (/text\/html/.test(e.clipboardData.types)) {
               console.log(e.clipboardData.getData('text/html'));
               elem.innerHTML = e.clipboardData.getData('text/html');
-              $scope.font = e.clipboardData.getData('text/html');
-              console.log($scope.font);
             }
             else if (/text\/plain/.test(e.clipboardData.types)) {
               console.log(e.clipboardData.getData('text/plain'));
               elem.innerHTML = e.clipboardData.getData('text/plain');
-              $scope.font = e.clipboardData.getData('text/plain');
-              console.log($scope.font);
             }
             else {
               elem.innerHTML = "";
-              $scope.font = "";
             }
           waitforpastedata(elem, savedcontent);
           if (e.preventDefault) {
@@ -85,14 +84,35 @@
         }
 
         function processpaste (elem, savedcontent) {
+          console.log(elem.childNodes);
+          console.log(typeof(elem.childNodes[0]));
+          console.log(angular.element(elem.childNodes[0]));
+
+          for (var i = 0; i < elem.childNodes.length; i++){
+            for (var j = 0, atts = elem.childNodes[i].attributes, n = atts.length, arr = []; j < n; j++){
+              arr.push(atts[j].nodeName);
+              console.log(atts[j].nodeName);
+            }
+          }
           pasteddata = elem.innerHTML;
           //^^Alternatively loop through dom (elem.childNodes or elem.getElementsByTagName) here
 
-          elem.innerHTML = savedcontent;
+          //elem.innerHTML = savedcontent;
 
           // Do whatever with gathered data;
           //alert(pasteddata);
+          
+          $scope.font = pasteddata;
+          console.log(pasteddata);
+          console.log(getUserBrowserFont(), 'font of span');
         }
+        
+        function getUserBrowserFont() {
+          var fontSpan = document.getElementById('font-div');
+          console.log(fontSpan);
+          return fontSpan.style.font;
+        }
+
     });
   </script>
 
